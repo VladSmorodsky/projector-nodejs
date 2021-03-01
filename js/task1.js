@@ -8,3 +8,5 @@ const groupBy = (array, func) => {
         return groupedObj; 
     }, {});
 }
+
+//console.log(groupBy([3.6, 3.7, 6.4, 8.9], Math.floor)) // { '3': [3.6, 3.7], '6': [6.4], '8': [8.9] }
