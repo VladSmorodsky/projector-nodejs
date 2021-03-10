@@ -49,41 +49,41 @@ const database = {
     },
 };
 
-const buyBookForUser = async (bookId, userId, callback) => {
-
-    try{
-        let user = await database.getUser(userId, callback);
-        let userLibrary = await database.getUsersBook(userId, callback);
-        //console.log(userLibrary);
-    } 
+const buyBookForUser = (bookId, userId, callback) => {
     
-    catch (err) {
-        callback(err);
+    let error = null;
+    let listUserBooks = [];
+
+    database.getUser(userId, (err, user) => {
+        error = err;
+    });
+
+    if(error) {
+        return callback(error);
     }
-    // database.getUser(userId, (err, user) => {
-    //     if (err) {
-    //         callback(err);
-    //     } else {
-    //         database.getUsersBook(userId, (err, userBooks) => {
-    //             if (err) {
-    //                 callback(err);
-    //             } else {
-    //                 if (userBooks.includes(bookId)) {
-    //                     callback(`User already has book with id=${bookId}`);
-    //                 } else {
-    //                     database.buyBook(bookId, (err) => {
-    //                         if (err) {
-    //                             callback(err);
-    //                         } else {
-    //                             callback(null, 'Success');
-    //                         }
-    //                     });
-    //                 }
-    //             }
-    //         })
-    //     }
-    // })
+
+    database.getUsersBook(userId, (err, userBooks) => {
+        error = err;
+        listUserBooks = userBooks;
+    });
+
+    if(error) {
+        return callback(error);      
+    }
+
+    if (listUserBooks.includes(bookId)) {
+        return callback(`User already has book with id=${bookId}`);
+    }
+
+    database.buyBook(bookId, (err) => {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, 'Success');
+        }
+    });
 }
+
 
 buyBookForUser(1,1, (err, message) => {
     console.log(err) // null
@@ -95,17 +95,17 @@ buyBookForUser(1,2, (err, message) => {
     console.log(message) // undefined
 })
 
-// buyBookForUser(3,2, (err, message) => {
-//     console.log(err) // null
-//     console.log(message) // 'Success'
-// })
+buyBookForUser(3,2, (err, message) => {
+    console.log(err) // null
+    console.log(message) // 'Success'
+})
 
-// buyBookForUser(5,2, (err, message) => {
-//     console.log(err) // 'Book with id=5 not found'
-//     console.log(message) // undefined
-// })
+buyBookForUser(5,2, (err, message) => {
+    console.log(err) // 'Book with id=5 not found'
+    console.log(message) // undefined
+})
 
-// buyBookForUser(1,3, (err, message) => {
-//     console.log(err) // 'User with id=3 not found'
-//     console.log(message) // undefined
-// })
+buyBookForUser(1,3, (err, message) => {
+    console.log(err) // 'User with id=3 not found'
+    console.log(message) // undefined
+})
